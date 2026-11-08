@@ -1,0 +1,673 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>_cbling_ - Print On Demand & Luxury Cafe</title>
+    <style>
+        :root {
+            --primary: #FFD700;
+            --primary-glow: rgba(255, 215, 0, 0.5);
+            --secondary: #FF4500;
+            --dark-bg: #0A0A0C;
+            --card-bg: #14141A;
+            --text-main: #FFFFFF;
+            --text-dim: #A1A1AA;
+            --accent: #E50914;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Password Overlay */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #1a1a2e 0%, #0a0a0c 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .pass-box {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 0 50px rgba(255, 69, 0, 0.2);
+            text-align: center;
+            border: 1px solid var(--secondary);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .pass-box h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .pass-box input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.8rem;
+            border-radius: 1rem;
+            border: 2px solid #333;
+            background: #000;
+            color: var(--primary);
+            text-align: center;
+            letter-spacing: 15px;
+            margin-bottom: 1.5rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .pass-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .pass-box button {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(45deg, var(--secondary), #ff8c00);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .pass-box button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 69, 0, 0.5);
+        }
+
+        /* Main Application */
+        #app-content { display: none; }
+
+        header {
+            background: rgba(10, 10, 12, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand-logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #FFFFFF 30%, #E50914 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(229, 9, 20, 0.4);
+        }
+
+        nav button {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid #333;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        nav button:hover, nav button.active {
+            color: white;
+            border-color: var(--secondary);
+            background: rgba(255, 69, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.3);
+        }
+
+        section {
+            padding: 5rem 2rem;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(255, 69, 0, 0.1) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--text-main), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid #27272a;
+            transition: transform 0.4s, border-color 0.4s, box-shadow 0.4s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 30px rgba(255, 69, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-desc {
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-buy {
+            display: block;
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(45deg, var(--secondary), #ff8c00);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: filter 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-buy:hover {
+            filter: brightness(1.2);
+        }
+
+        /* Customizer Studio */
+        .studio-container {
+            background: var(--card-bg);
+            border-radius: 2rem;
+            padding: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            border: 1px solid #27272a;
+        }
+
+        .preview-box {
+            background: #000;
+            border-radius: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 450px;
+            border: 2px dashed #333;
+        }
+
+        #garment-preview {
+            width: 80%;
+            height: 80%;
+            transition: fill 0.3s;
+        }
+
+        #custom-logo-display {
+            position: absolute;
+            max-width: 30%;
+            max-height: 30%;
+            display: none;
+            cursor: move;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+        }
+
+        .controls-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        select, input[type="file"], input[type="text"] {
+            padding: 1rem;
+            border-radius: 1rem;
+            background: #0A0A0C;
+            border: 1px solid #333;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+        }
+
+        .color-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-circle:hover { transform: scale(1.1); }
+
+        /* Admin Panel */
+        #admin-section {
+            display: none;
+            background: #0f0f12;
+            border: 1px solid var(--secondary);
+            border-radius: 2rem;
+            padding: 3rem;
+            margin-top: 3rem;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label { display: block; margin-bottom: 0.5rem; }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 1rem;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            padding: 5rem 2rem;
+            text-align: center;
+            border-top: 1px solid #333;
+        }
+
+        .footer-logo {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .location-tag {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #1a1a2e;
+            color: var(--secondary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            border: 1px solid var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 992px) {
+            .studio-container { grid-template-columns: 1fr; }
+            .admin-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 3.5rem; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Password Overlay -->
+    <div id="password-overlay">
+        <div class="pass-box">
+            <h2>_cbling_ ADMIN</h2>
+            <input type="password" id="pass-input" maxlength="4" placeholder="••••">
+            <button onclick="checkAccess()">UNLOCK PORTAL</button>
+            <p id="pass-error" style="color: var(--secondary); margin-top: 1rem; display: none; font-weight: bold;"> गलत पिन! डिफ़ॉल्ट पिन 0000 है</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="app-content">
+        <header>
+            <div class="brand-logo">_cbling_</div>
+            <nav>
+                <button class="nav-btn active" onclick="switchTab('home')">Home</button>
+                <button class="nav-btn" onclick="switchTab('catalog')">Catalog</button>
+                <button class="nav-btn" onclick="switchTab('studio')">Custom Studio</button>
+                <button class="nav-btn" onclick="switchTab('admin')" style="border-color: var(--primary); color: var(--primary);">Admin Panel</button>
+            </nav>
+        </header>
+
+        <!-- Home Section -->
+        <section id="home-section" class="tab-content">
+            <div class="hero">
+                <h1>PRINT ON DEMAND</h1>
+                <p style="font-size: 1.5rem; color: var(--text-dim); max-width: 600px; margin-bottom: 3rem;">
+                    अपने ब्रांड, लोगो और डिज़ाइनों को प्रीमियम कपड़ों और स्वादिष्ट बेकरी आइटम्स पर साकार करें।
+                </p>
+                <button class="btn-buy" style="max-width: 300px; padding: 1.5rem 2rem; font-size: 1.3rem;" onclick="switchTab('studio')">START CUSTOMIZING</button>
+            </div>
+        </section>
+
+        <!-- Catalog Section -->
+        <section id="catalog-section" class="tab-content" style="display: none;">
+            <h2 class="section-title">Exclusive Collection</h2>
+            <div class="product-grid" id="product-grid-container">
+                <!-- Dynamically populated by Admin -->
+            </div>
+        </section>
+
+        <!-- Custom Studio -->
+        <section id="studio-section" class="tab-content" style="display: none;">
+            <h2 class="section-title">Interactive Studio</h2>
+            <div class="studio-container">
+                <div class="preview-box">
+                    <svg id="garment-preview" viewBox="0 0 200 200">
+                        <!-- Default T-Shirt vector path -->
+                        <path id="garment-shape" d="M50 20 L70 20 Q80 40 100 40 Q120 40 130 20 L150 20 Q160 60 150 90 L140 90 L140 180 L60 180 L60 90 L50 90 Q40 60 50 20 Z" fill="#FFFFFF"/>
+                    </svg>
+                    <img id="custom-logo-display" src="" alt="Custom Logo">
+                </div>
+
+                <div class="controls-box">
+                    <div class="control-group">
+                        <label>Select Apparel</label>
+                        <select id="garment-type" onchange="updateApparelType()">
+                            <option value="tshirt">Round Neck T-Shirt</option>
+                            <option value="oversized">Oversized Tee</option>
+                            <option value="hoodie">Winter Hoodie</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Choose Color</label>
+                        <div class="color-picker-grid">
+                            <div class="color-circle" style="background: #FFFFFF; border: 1px solid #ccc;" onclick="setGarmentColor('#FFFFFF')"></div>
+                            <div class="color-circle" style="background: #000000;" onclick="setGarmentColor('#000000')"></div>
+                            <div class="color-circle" style="background: #E50914;" onclick="setGarmentColor('#E50914')"></div>
+                            <div class="color-circle" style="background: #1d4ed8;" onclick="setGarmentColor('#1d4ed8')"></div>
+                            <div class="color-circle" style="background: #f59e0b;" onclick="setGarmentColor('#f59e0b')"></div>
+                            <div class="color-circle" style="background: #10b981;" onclick="setGarmentColor('#10b981')"></div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Upload Brand Logo / Design</label>
+                        <input type="file" accept="image/*" onchange="loadCustomLogo(event)">
+                    </div>
+
+                    <button class="btn-buy" style="background: var(--primary); color: #000;" onclick="orderViaInstagram()">ORDER VIA INSTAGRAM</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="admin-section">
+            <h2 class="section-title">Owner Dashboard</h2>
+            <div class="admin-grid">
+                <div>
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem; color: var(--secondary);">➕ Add New Product</h3>
+                    <div class="form-group">
+                        <label>Product Title</label>
+                        <input type="text" id="admin-prod-title" placeholder="e.g. Custom Brand Hoodie">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="admin-prod-price" placeholder="e.g. 999">
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="admin-prod-img" placeholder="Paste Unsplash/Image link here">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="admin-prod-desc" rows="3" placeholder="Brief details about the item"></textarea>
+                    </div>
+                    <button class="btn-buy" onclick="addNewProduct()">Publish to Catalog</button>
+                </div>
+
+                <div style="border-left: 1px solid #333; padding-left: 2rem;">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem; color: var(--primary);">🔐 Security Settings</h3>
+                    <div class="form-group">
+                        <label>Change Admin PIN</label>
+                        <input type="password" id="admin-new-pin" maxlength="4" placeholder="Enter new 4-digit PIN">
+                    </div>
+                    <button class="btn-buy" style="background: var(--primary); color: #000;" onclick="updatePin()">Update PIN</button>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-logo">_cbling_</div>
+            <p class="location-tag">📍 Location: Block Ke Samne, HDFC Bank Ke Bagal Mein, Rajat Complex, Maharajganj</p>
+            <a href="https://www.instagram.com/_cbling_/" class="social-link" target="_blank">📸 Visit Official Instagram</a>
+        </footer>
+    </div>
+
+    <script>
+        // State Management
+        let adminPin = localStorage.getItem('cbling_master_pin') || '0000';
+        let products = JSON.parse(localStorage.getItem('cbling_products')) || [
+            { title: "Custom Print T-Shirt", price: 499, img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80", desc: "High quality cotton tee with custom print." },
+            { title: "Gourmet Jar Cake", price: 180, img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80", desc: "Freshly layered rich chocolate jar cake." }
+        ];
+
+        // Access Control
+        function checkAccess() {
+            const input = document.getElementById('pass-input').value;
+            if(input === adminPin) {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                renderCatalog();
+            } else {
+                document.getElementById('pass-error').style.display = 'block';
+            }
+        }
+
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`${tabId}-section`).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        // Catalog Functions
+        function renderCatalog() {
+            const container = document.getElementById('product-grid-container');
+            container.innerHTML = '';
+            products.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${p.img}" class="product-image" alt="${p.title}">
+                    <div class="product-info">
+                        <div>
+                            <h3 class="product-title">${p.title}</h3>
+                            <p class="product-desc">${p.desc}</p>
+                        </div>
+                        <div>
+                            <div class="product-price">₹${p.price}</div>
+                            <button class="btn-buy" onclick="orderItem('${p.title}')">Order via Instagram</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addNewProduct() {
+            const title = document.getElementById('admin-prod-title').value;
+            const price = document.getElementById('admin-prod-price').value;
+            const img = document.getElementById('admin-prod-img').value;
+            const desc = document.getElementById('admin-prod-desc').value;
+
+            if(title && price && img) {
+                products.push({ title, price: Number(price), img, desc });
+                localStorage.setItem('cbling_products', JSON.stringify(products));
+                alert('Product added successfully!');
+                renderCatalog();
+                // Clear inputs
+                document.getElementById('admin-prod-title').value = '';
+                document.getElementById('admin-prod-price').value = '';
+                document.getElementById('admin-prod-img').value = '';
+                document.getElementById('admin-prod-desc').value = '';
+            } else {
+                alert('Please fill all required fields!');
+            }
+        }
+
+        function updatePin() {
+            const newPin = document.getElementById('admin-new-pin').value;
+            if(newPin.length === 4) {
+                adminPin = newPin;
+                localStorage.setItem('cbling_master_pin', newPin);
+                alert('Master PIN updated successfully!');
+                document.getElementById('admin-new-pin').value = '';
+            } else {
+                alert('Enter a valid 4-digit PIN');
+            }
+        }
+
+        // Studio Functions
+        function setGarmentColor(color) {
+            document.getElementById('garment-shape').setAttribute('fill', color);
+        }
+
+        function loadCustomLogo(event) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('custom-logo-display');
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateApparelType() {
+            const type = document.getElementById('garment-type').value;
+            const path = document.getElementById('garment-shape');
+            if(type === 'oversized') {
+                path.setAttribute('d', 'M40 20 L80 20 Q90 40 100 40 Q110 40 120 20 L160 20 Q170 70 160 100 L150 100 L150 180 L50 180 L50 100 L40 100 Q30 70 40 20 Z');
+            } else if(type === 'hoodie') {
+                path.setAttribute('d', 'M50 30 L70 30 Q80 50 100 50 Q120 50 130 30 L150 30 Q160 70 150 100 L140 100 L140 180 L60 180 L60 100 L50 100 Q40 70 50 30 Z M80 15 L120 15 L115 35 L85 35 Z');
+            } else {
+                path.setAttribute('d', 'M50 20 L70 20 Q80 40 100 40 Q120 40 130 20 L150 20 Q160 60 150 90 L140 90 L140 180 L60 180 L60 90 L50 90 Q40 60 50 20 Z');
+            }
+        }
+
+        function orderItem(prodName) {
+            window.open(`https://www.instagram.com/_cbling_/`, '_blank');
+        }
+
+        function orderViaInstagram() {
+            window.open(`https://www.instagram.com/_cbling_/`, '_blank');
+        }
+    </script>
+</body>
+</html>
+
